@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 
 interface Venue {
@@ -34,6 +34,8 @@ interface Seat {
 export default function EventDetailsPage() {
   const params = useParams();
   const eventId = params.eventId as string;
+  const router = useRouter();
+  
 
   const [event, setEvent] = useState<Event | null>(null);
   const [seats, setSeats] = useState<Seat[]>([]);
@@ -41,7 +43,6 @@ export default function EventDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [seatsLoading, setSeatsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingMessage, setBookingMessage] = useState("");
 
   useEffect(() => {
@@ -108,68 +109,29 @@ export default function EventDetailsPage() {
   };
 
   const handleBooking = async () => {
-    try {
-      setBookingLoading(true);
-      setBookingMessage("");
+  const user = auth.currentUser;
 
-      const user = auth.currentUser;
+  if (selectedSeats.length === 0) {
+    setBookingMessage("Please select at least one seat.");
+    return;
+  }
 
-      if (!user) {
-        setBookingMessage("Please login to book tickets.");
-        return;
-      }
+  if (!user) {
+    const seats = selectedSeats.join(",");
 
-      if (selectedSeats.length === 0) {
-        setBookingMessage("Please select at least one seat.");
-        return;
-      }
+    router.push(
+      `/login?eventId=${eventId}&seats=${encodeURIComponent(seats)}`
+    );
 
-      const idToken = await user.getIdToken();
+    return;
+  }
 
-      const response = await fetch("/api/bookings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({
-          eventId,
-          seatIds: selectedSeats,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setBookingMessage(
-          data.message || "Booking failed."
-        );
-        return;
-      }
-
-      setBookingMessage(
-        "Booking confirmed successfully!"
-      );
-
-      setSelectedSeats([]);
-
-      // Refresh seat availability after booking
-      const seatsResponse = await fetch(
-        `/api/events/${eventId}/seats`
-      );
-
-      const seatsData = await seatsResponse.json();
-
-      if (seatsResponse.ok) {
-        setSeats(seatsData.seats);
-      }
-    } catch (error) {
-      console.error("Booking failed:", error);
-      setBookingMessage("Something went wrong.");
-    } finally {
-      setBookingLoading(false);
-    }
-  };
+  router.push(
+    `/checkout?eventId=${eventId}&seats=${encodeURIComponent(
+      selectedSeats.join(",")
+    )}`
+  );
+};
 
   if (loading) {
     return (
@@ -509,21 +471,17 @@ export default function EventDetailsPage() {
 
             {/* Book button */}
             <button
-              type="button"
-              disabled={
-                selectedCount === 0 || bookingLoading
-              }
-              onClick={handleBooking}
-              className="mt-6 w-full rounded-xl bg-black px-6 py-4 text-lg font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
-            >
-              {bookingLoading
-                ? "Booking..."
-                : selectedCount === 0
-                ? "Select Seats to Continue"
-                : `Book ${selectedCount} Ticket${
-                    selectedCount !== 1 ? "s" : ""
-                  }`}
-            </button>
+  type="button"
+  disabled={selectedCount === 0}
+  onClick={handleBooking}
+  className="mt-6 w-full rounded-xl bg-black px-6 py-4 text-lg font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
+>
+  {selectedCount === 0
+    ? "Select Seats to Continue"
+    : `Confirm ${selectedCount} Seat${
+        selectedCount !== 1 ? "s" : ""
+      }`}
+</button>
 
             {/* Booking message */}
             {bookingMessage && (

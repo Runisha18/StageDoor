@@ -1,18 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Suspense, useState } from "react";
+import {
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { auth } from "@/lib/firebase";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const eventId = searchParams.get("eventId");
+  const seats = searchParams.get("seats");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,17 +36,46 @@ export default function LoginPage() {
         password
       );
 
-      router.push("/");
-    } catch (error) {
-      console.error("Login failed:", error);
+      if (eventId && seats) {
+        router.push(
+          `/checkout?eventId=${encodeURIComponent(
+            eventId
+          )}&seats=${encodeURIComponent(seats)}`
+        );
+      } else {
+        router.push("/");
+      }
+  } catch (error) {
+  console.error("Login failed:", error);
 
-      setError(
-        "Invalid email or password. Please try again."
-      );
-    } finally {
+  if (
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    (
+      error.code === "auth/user-not-found" ||
+      error.code === "auth/invalid-credential"
+    )
+  ) {
+    setError(
+      "Account not found. Please create an account first."
+    );
+  } else {
+    setError(
+      "Invalid email or password. Please try again."
+    );
+  }
+}finally {
       setLoading(false);
     }
   };
+
+  const registerUrl =
+    eventId && seats
+      ? `/register?eventId=${encodeURIComponent(
+          eventId
+        )}&seats=${encodeURIComponent(seats)}`
+      : "/register";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
@@ -112,10 +150,19 @@ export default function LoginPage() {
 
           {/* Error */}
           {error && (
-            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              {error}
-            </div>
-          )}
+  <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+    <p>{error}</p>
+
+    {error.includes("Account not found") && (
+      <Link
+        href={registerUrl}
+        className="mt-2 inline-block font-semibold underline"
+      >
+        Create an account
+      </Link>
+    )}
+  </div>
+)}
 
           {/* Login Button */}
           <button
@@ -130,7 +177,7 @@ export default function LoginPage() {
           <p className="mt-6 text-center text-sm text-gray-500">
             Don&apos;t have an account?{" "}
             <Link
-              href="/register"
+              href={registerUrl}
               className="font-semibold text-black hover:underline"
             >
               Create an account
@@ -150,5 +197,23 @@ export default function LoginPage() {
 
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
+          <div className="rounded-xl bg-white p-8 shadow">
+            <p className="text-gray-600">
+              Loading login...
+            </p>
+          </div>
+        </main>
+      }
+    >
+      <LoginPageContent />
+    </Suspense>
   );
 }

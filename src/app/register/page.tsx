@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { auth } from "@/lib/firebase";
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -18,6 +22,9 @@ export default function RegisterPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const eventId = searchParams.get("eventId");
+  const seats = searchParams.get("seats");
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,8 +74,17 @@ export default function RegisterPage() {
         );
       }
 
-      // 5. Registration successful
-      router.push("/");
+      // 5. Continue booking if registration
+      // started from seat selection.
+      if (eventId && seats) {
+        router.push(
+          `/checkout?eventId=${encodeURIComponent(
+            eventId
+          )}&seats=${encodeURIComponent(seats)}`
+        );
+      } else {
+        router.push("/");
+      }
     } catch (error) {
       console.error("Registration failed:", error);
 
@@ -79,6 +95,13 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  const loginUrl =
+    eventId && seats
+      ? `/login?eventId=${encodeURIComponent(
+          eventId
+        )}&seats=${encodeURIComponent(seats)}`
+      : "/login";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
@@ -198,7 +221,7 @@ export default function RegisterPage() {
           <p className="mt-6 text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Link
-              href="/login"
+              href={loginUrl}
               className="font-semibold text-black hover:underline"
             >
               Login
@@ -218,5 +241,23 @@ export default function RegisterPage() {
 
       </div>
     </main>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
+          <div className="rounded-xl bg-white p-8 shadow">
+            <p className="text-gray-600">
+              Loading registration...
+            </p>
+          </div>
+        </main>
+      }
+    >
+      <RegisterPageContent />
+    </Suspense>
   );
 }
