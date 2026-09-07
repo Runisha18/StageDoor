@@ -1,101 +1,139 @@
-import Image from "next/image";
+import Link from "next/link";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <main className="min-h-screen bg-gray-100">
+      {/* Hero Section */}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <section className="flex min-h-[70vh] items-center justify-center px-6">
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-purple-600">
+            Welcome to StageDoor
+          </p>
+
+          <h1 className="text-5xl font-bold tracking-tight md:text-7xl">
+            Your Next Experience
+            <span className="block">
+              Starts Here.
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 md:text-xl">
+            Discover amazing events, choose your favorite
+            seats, and book your tickets with ease.
+          </p>
+
+          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+            <Link
+              href="/events"
+              className="rounded-lg bg-black px-8 py-3 font-medium text-white transition hover:bg-gray-800"
+            >
+              Explore Events
+            </Link>
+
+            <Link
+              href="/bookings"
+              className="rounded-lg border border-gray-300 bg-white px-8 py-3 font-medium text-black transition hover:bg-gray-50"
+            >
+              My Bookings
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+
+      {/* Features Section */}
+
+      <section className="bg-white px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold">
+              Everything You Need
+            </h2>
+
+            <p className="mt-3 text-gray-600">
+              A simple and convenient way to manage your
+              event bookings.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+
+            {/* Feature 1 */}
+
+            <div className="rounded-xl border bg-gray-50 p-6 text-center">
+              <div className="text-4xl">
+                🎟️
+              </div>
+
+              <h3 className="mt-4 text-xl font-bold">
+                Easy Booking
+              </h3>
+
+              <p className="mt-2 text-gray-600">
+                Browse events and book your tickets in
+                just a few clicks.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+
+            <div className="rounded-xl border bg-gray-50 p-6 text-center">
+              <div className="text-4xl">
+                💺
+              </div>
+
+              <h3 className="mt-4 text-xl font-bold">
+                Choose Your Seats
+              </h3>
+
+              <p className="mt-2 text-gray-600">
+                Select your preferred seats using our
+                interactive seating layout.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+
+            <div className="rounded-xl border bg-gray-50 p-6 text-center">
+              <div className="text-4xl">
+                📋
+              </div>
+
+              <h3 className="mt-4 text-xl font-bold">
+                Manage Bookings
+              </h3>
+
+              <p className="mt-2 text-gray-600">
+                View your booking history and cancel
+                bookings whenever needed.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Call To Action */}
+
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-4xl rounded-2xl bg-black px-6 py-12 text-center text-white">
+          <h2 className="text-3xl font-bold">
+            Ready for your next event?
+          </h2>
+
+          <p className="mx-auto mt-3 max-w-xl text-gray-300">
+            Explore upcoming events and reserve your
+            seats today.
+          </p>
+
+          <Link
+            href="/events"
+            className="mt-6 inline-block rounded-lg bg-white px-8 py-3 font-medium text-black transition hover:bg-gray-200"
+          >
+            Browse Events
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }
