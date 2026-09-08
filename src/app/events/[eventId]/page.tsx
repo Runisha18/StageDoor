@@ -108,7 +108,7 @@ export default function EventDetailsPage() {
     });
   };
 
-  const handleBooking = async () => {
+  const handleBooking = () => {
   const user = auth.currentUser;
 
   if (selectedSeats.length === 0) {
@@ -117,12 +117,9 @@ export default function EventDetailsPage() {
   }
 
   if (!user) {
-    const seats = selectedSeats.join(",");
-
-    router.push(
-      `/login?eventId=${eventId}&seats=${encodeURIComponent(seats)}`
+    setBookingMessage(
+      "You are not logged in or registered. Please login or register to book your selected seats."
     );
-
     return;
   }
 
@@ -484,17 +481,52 @@ export default function EventDetailsPage() {
 </button>
 
             {/* Booking message */}
-            {bookingMessage && (
-              <div
-                className={`mt-4 rounded-lg border p-4 text-center font-medium ${
-                  bookingMessage.includes("successfully")
-                    ? "border-green-200 bg-green-50 text-green-700"
-                    : "border-red-200 bg-red-50 text-red-700"
-                }`}
-              >
-                {bookingMessage}
-              </div>
-            )}
+{bookingMessage && (
+  <div
+    className={`mt-4 rounded-xl border p-5 text-center ${
+      bookingMessage.includes("successfully")
+        ? "border-green-200 bg-green-50 text-green-700"
+        : "border-yellow-200 bg-yellow-50 text-yellow-800"
+    }`}
+  >
+    <p className="font-semibold">
+      {bookingMessage}
+    </p>
+
+    {!auth.currentUser &&
+      !bookingMessage.includes("successfully") && (
+        <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => {
+              router.push(
+                `/login?eventId=${eventId}&seats=${encodeURIComponent(
+                  selectedSeats.join(",")
+                )}`
+              );
+            }}
+            className="rounded-lg bg-black px-5 py-2.5 font-semibold text-white transition hover:bg-gray-800"
+          >
+            Login
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              router.push(
+                `/register?eventId=${eventId}&seats=${encodeURIComponent(
+                  selectedSeats.join(",")
+                )}`
+              );
+            }}
+            className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-semibold text-gray-800 transition hover:bg-gray-50"
+          >
+            Create Account
+          </button>
+        </div>
+      )}
+  </div>
+)}
 
           </div>
         </section>
